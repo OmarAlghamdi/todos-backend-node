@@ -1,0 +1,160 @@
+openapi: '3.0.2'
+info:
+  title: todos
+  version: '1.0'
+servers:
+  - url: http://localhost:3000/api
+  # - url: https://api.server.test/v1
+
+paths:         
+  /todos:
+    get:
+      description: get all todos of the signed in user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Todo'
+    post:
+      description: create a new todo
+      requestBody:
+        $ref: '#/components/requestBodies/TodoBody'
+      responses:
+        '200':
+          description: OK
+          $ref: '#/components/responses/TodoResponse'
+
+  /todos/{id}:
+    put:
+      description: update a tod
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type : string
+          required: true
+      requestBody:
+        $ref: '#/components/requestBodies/TodoBody'
+      responses:
+        '200':
+          description: OK
+          $ref: '#/components/responses/TodoResponse'
+
+    delete:
+      description: delete a todo
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type : string
+          required: true
+      responses:
+        '200':
+          description: OK
+          $ref: '#/components/responses/TodoResponse'
+
+  /auth/signin:
+    post:
+      description: sign in
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: saul.goodman@jmm.com
+                password:
+                  type: string
+                  example: Ice Station Zebra
+      responses:
+        '200':
+          description: OK
+          $ref: '#/components/responses/JWTResponse'
+          
+
+  /auth/signup:
+    post:
+      description: sign up a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: OK
+          $ref: '#/components/responses/JWTResponse'
+
+components:
+  schemas:
+    Todo: 
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          example: film a commercial
+    
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          example: saul.goodman@jmm.com
+        name:
+          type: string
+          example: Saul Goodman
+        password:
+          type: string
+          example: Ice Station Zebra
+
+  requestBodies:
+    TodoBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              todo:
+                $ref: '#/components/schemas/Todo'
+  responses:
+    TodoResponse:
+      description: a todo
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Todo'
+    
+    JWTResponse:
+      description: JWT
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: string
+
+
+
