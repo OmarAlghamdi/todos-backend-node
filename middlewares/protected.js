@@ -5,9 +5,12 @@ const { User } = require('../sequelize')
 module.exports = async (req, res, next) => {
     if(!req.headers.authorization){
         console.error('no authorization header')
-        return
+        return next({
+            message: 'sign in is required',
+            statusCode: 401
+        })
     }
-    console.log('protect middleware');
+    console.log('protect middleware')
     const token = req.headers.authorization.replace('Bearer', '').trim()
 
    try {
@@ -22,8 +25,12 @@ module.exports = async (req, res, next) => {
 
        req.user = user
        console.log('authenticated');
-       next()
+       return next()
    } catch (err) {
-        console.error(err);
+        console.error(err)
+        return next({
+            message: 'sign in is required',
+            statusCode: 401
+        })
    }
 }
