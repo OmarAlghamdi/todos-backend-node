@@ -4,7 +4,7 @@ const express = require('express')
 const auth = require('./routers/auth')
 const todos = require('./routers/todos')
 
-const db = require('./sequelize')
+require('./sequelize')
 const errorHandler = require('./middlewares/errorHandler')
 
 const app = express()

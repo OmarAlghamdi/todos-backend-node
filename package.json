@@ -5,11 +5,13 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
+    "lint": "eslint . >> \"./lint-report-`date -u \"+%F-%T\"`.txt\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Omar Alghamdi",
   "license": "MIT",
   "devDependencies": {
+    "eslint": "^7.28.0",
     "nodemon": "^2.0.7"
   },
   "dependencies": {
