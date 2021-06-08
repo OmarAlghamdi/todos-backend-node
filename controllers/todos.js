@@ -5,7 +5,8 @@ const getTodos = (req, res, next) => {
 	Todo.findAll({
 		where: {
 			UserId: req.user.id
-		}
+		},
+		attributes: ['id', 'name']
 	}).then(todos => res.json({ data: todos }))
 }
 
@@ -15,7 +16,8 @@ const createTodo = (req, res, next) => {
 	Todo.create({
 		...todo,
 		UserId: req.user.id
-	}).then(todo => res.json({ data: todo }))
+	}, {
+	}).then(todo => res.json({ data: { id: todo.id, name: todo.name} }))
 }
 
 const updateTodo = (req, res, next) => {
@@ -32,7 +34,9 @@ const updateTodo = (req, res, next) => {
 			console.log('rows:', rows)
 			if (rows == 0) return res.status(404).end()
 
-			return Todo.findByPk(req.params.id)
+			return Todo.findByPk(req.params.id, {
+				attributes: ['id', 'name']
+			})
 		})
 		.then(todo => res.json({ data: todo }))
 		.catch(err => console.error(err))
@@ -44,7 +48,8 @@ const deleteTodo = (req, res, next) => {
 		where: {
 			id: req.params.id,
 			UserId: req.user.id
-		}
+		},
+		attributes: ['id', 'name']
 	})
 		.then(todo => {
 			if (!todo) return res.status(404).end()
