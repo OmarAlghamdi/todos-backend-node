@@ -13,6 +13,13 @@ const getTodos = (req, res, next) => {
 const createTodo = (req, res, next) => {
 	const todo = req.body.todo
 
+	if(!todo || !todo.name || typeof todo.name !== 'string')
+		return next({
+			statusCode: 400,
+			message: 'request body should contain {todo:{name:<string>}}'
+		})
+	
+
 	Todo.create({
 		...todo,
 		UserId: req.user.id
@@ -22,6 +29,12 @@ const createTodo = (req, res, next) => {
 
 const updateTodo = (req, res, next) => {
 	const todo = req.body.todo
+
+	if(!todo || !todo.name || typeof todo.name !== 'string')
+		return next({
+			statusCode: 400,
+			message: 'request body should contain {todo:{name:<string>}}'
+		})
 
 	Todo.update(todo, {
 		where: {
