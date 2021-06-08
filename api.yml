@@ -6,6 +6,8 @@ servers:
   - url: http://localhost:3000/api
   # - url: https://api.server.test/v1
 
+# TODO formalize 4XX responses in /auth
+
 paths:         
   /todos:
     get:
@@ -22,14 +24,21 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Todo'
+        '401':
+          $ref: '#/components/responses/AuthRequired'
+    
     post:
       description: create a new todo
       requestBody:
         $ref: '#/components/requestBodies/TodoBody'
       responses:
         '200':
-          description: OK
           $ref: '#/components/responses/TodoResponse'
+        '400':
+          $ref: '#/components/responses/BadTodo'
+        '401':
+          $ref: '#/components/responses/AuthRequired'
+          
 
   /todos/{id}:
     put:
@@ -44,8 +53,13 @@ paths:
         $ref: '#/components/requestBodies/TodoBody'
       responses:
         '200':
-          description: OK
           $ref: '#/components/responses/TodoResponse'
+        '400':
+          $ref: '#/components/responses/BadTodo'
+        '401':
+          $ref: '#/components/responses/AuthRequired'
+        '404':
+          $ref: '#/components/responses/TodoNotFound'
 
     delete:
       description: delete a todo
@@ -57,8 +71,11 @@ paths:
           required: true
       responses:
         '200':
-          description: OK
           $ref: '#/components/responses/TodoResponse'
+        '401':
+          $ref: '#/components/responses/AuthRequired'
+        '404':
+          $ref: '#/components/responses/TodoNotFound' 
 
   /auth/signin:
     post:
@@ -77,8 +94,11 @@ paths:
                   example: Ice Station Zebra
       responses:
         '200':
-          description: OK
           $ref: '#/components/responses/JWTResponse'
+        '400':
+          description: Bad request (credentials are not valid)
+        '404':
+          description: Not Found (user does not exist) 
           
 
   /auth/signup:
@@ -94,8 +114,9 @@ paths:
                   $ref: '#/components/schemas/User'
       responses:
         '200':
-          description: OK
           $ref: '#/components/responses/JWTResponse'
+        '400':
+          description: Bad request (credentials are not valid or user already exists)
 
 components:
   schemas:
@@ -156,5 +177,50 @@ components:
               data:
                 type: string
 
+    AuthRequired:
+      description: not authenticated, authorization is required
+      headers:
+        'WWW-Authenticate':
+          schema:
+            type: string
+            description: authorization header is required
+            example: Bearer realm="accessing todos"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: sign in is required
 
+    BadTodo:
+      description: todo object is malformed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: request body should contain {todo:{name:<string>}}
 
+    TodoNotFound:
+      description: no such todo for the specified id
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: no such todo with id:e3f7de63-e740-4c84-99ff-e9d043f0ffe0
