@@ -7,6 +7,13 @@ const signup = async (req, res, next) => {
 	try {
 		const u = req.body.user
 
+		if(!u || !u.name || !u.password || !u.email
+			|| typeof u.name !== 'string' || typeof u.password !== 'string' || typeof u.email !== 'string') 
+			return next({
+				statusCode: 400,
+				message: 'request body should contain {user:{name:<string>, email:<string>, password:<string>}}'
+			})
+
 		const user = await User.create(u)
 
 		const salt = await bcrypt.genSalt(10)
@@ -31,14 +38,21 @@ const signup = async (req, res, next) => {
 const signin = async (req, res, next) => {
 	const { email, password } = req.body
 
+	if(!email || !password
+		|| typeof email !== 'string' || typeof password !== 'string')
+		return next({
+			statusCode: 400,
+			message: 'request body should contain {email<string>, password:<string>}'
+		})
+
 	const user = await User.findOne({
 		where: { email: email }
 	})
 
 	if (!user)
 		return next({
-			message: 'email & password do not match',
-			statusCode: 400
+			message: 'email is not registered, want to sign up?',
+			statusCode: 404
 		})
 
 	const correctPassword = await bcrypt.compare(password, user.password)

@@ -6,8 +6,6 @@ servers:
   - url: http://localhost:3000/api
   # - url: https://api.server.test/v1
 
-# TODO formalize 4XX responses in /auth
-
 paths:         
   /todos:
     get:
@@ -96,9 +94,31 @@ paths:
         '200':
           $ref: '#/components/responses/JWTResponse'
         '400':
-          description: Bad request (credentials are not valid)
+          description: Bad request (credentials are not valid or malformed)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: request body should contain {email<string>, password:<string>}
         '404':
           description: Not Found (user does not exist) 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: email is not registered, want to sign up?
           
 
   /auth/signup:
@@ -116,7 +136,18 @@ paths:
         '200':
           $ref: '#/components/responses/JWTResponse'
         '400':
-          description: Bad request (credentials are not valid or user already exists)
+          description: Bad request (credentials are malformed or user already exists)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: request body should contain {user:{name:<string>, email:<string>, password:<string>}}
 
 components:
   schemas:
