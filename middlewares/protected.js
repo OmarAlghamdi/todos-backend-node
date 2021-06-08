@@ -6,7 +6,6 @@ module.exports = async (req, res, next) => {
 	if (!req.headers.authorization) {
 		console.error('no authorization header')
 		return next({
-			message: 'sign in is required',
 			statusCode: 401
 		})
 	}
@@ -29,7 +28,6 @@ module.exports = async (req, res, next) => {
 	} catch (err) {
 		console.error(err)
 		return next({
-			message: 'sign in is required',
 			statusCode: 401
 		})
 	}
