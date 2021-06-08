@@ -10,6 +10,8 @@ paths:
   /todos:
     get:
       description: get all todos of the signed in user
+      security:
+        - jwt: []
       responses:
         '200':
           description: OK
@@ -27,6 +29,8 @@ paths:
     
     post:
       description: create a new todo
+      security:
+        - jwt: []
       requestBody:
         $ref: '#/components/requestBodies/TodoBody'
       responses:
@@ -40,7 +44,9 @@ paths:
 
   /todos/{id}:
     put:
-      description: update a tod
+      description: update a todo
+      security:
+        - jwt: []
       parameters:
         - in: path
           name: id
@@ -61,6 +67,8 @@ paths:
 
     delete:
       description: delete a todo
+      security:
+        - jwt: []
       parameters:
         - in: path
           name: id
@@ -79,6 +87,7 @@ paths:
     post:
       description: sign in
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -125,6 +134,7 @@ paths:
     post:
       description: sign up a new user
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -150,6 +160,11 @@ paths:
                         example: request body should contain {user:{name:<string>, email:<string>, password:<string>}}
 
 components:
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+
   schemas:
     Todo: 
       type: object
