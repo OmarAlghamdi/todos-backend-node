@@ -1,8 +1,37 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const mailjet = require('node-mailjet').connect(
+	process.env.MJ_APIKEY_PUBLIC,
+	process.env.MJ_APIKEY_PRIVATE
+)
+
 const { UniqueConstraintError, ValidationError } = require('sequelize')
 
 const { User } = require('../sequelize')
+
+const sendVerificationEmail = async (email, name, link) => {
+	return mailjet.post('send', { version: 'v3.1' }).request({
+		Messages: [
+			{
+				From: {
+					Email: process.env.EMAIL,
+					Name: 'Todos'
+				},
+				To: [
+					{
+						Email: email,
+						Name: name
+					}
+				],
+				Subject: 'Welcome to Todos',
+				TextPart: `To verify your email follow this link: ${process.env.DNS_HOSTNAME}/auth/verify/${link}`,
+				HTMLPart:
+					`<h3>Welcome to <a href='${process.env.HOSTNAME}/'>Todos</a>!</h3><br />To verify your email visit <a href='${process.env.DNS_HOSTNAME}/auth/verify/${link}'/>${process.env.DNS_HOSTNAME}/auth/verify/${link}<a>`,
+				// CustomID: 'AppGettingStartedTest'
+			}
+		]
+	})
+}
 
 const signup = async (req, res, next) => {
 	try {
@@ -21,12 +50,27 @@ const signup = async (req, res, next) => {
 		user.password = await bcrypt.hash(user.password, salt)
 		await user.save()
 
-		const payload = { id: user.id }
-		const token = jwt.sign(payload, process.env.JWT_SECRET, {
-			expiresIn: process.env.JWT_EXPIRATION
-		})
+		// const payload = { id: user.id }
+		// const token = jwt.sign(payload, process.env.JWT_SECRET, {
+		// 	expiresIn: process.env.JWT_EXPIRATION
+		// })
 
-		return res.json({ data: token })
+		user.verificationLink = await bcrypt.hash(user.id, salt)
+		await user.save()
+
+		// return res.json({ data: token })
+
+		try {
+			await sendVerificationEmail(user.email, user.name, user.verificationLink)
+			console.log('send successfully')
+		} catch (err) {
+			console.error(err);
+		}
+		
+
+		return res.json({
+			data: 'a verification email has been sent to you. please see your email.'
+		})
 	} catch (err) {
 		console.error(err)
 		

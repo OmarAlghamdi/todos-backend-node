@@ -26,6 +26,8 @@ const Todo = todoModel(sequelize)
 User.hasMany(Todo)
 Todo.belongsTo(User)
 
-sequelize.sync()
+sequelize.sync({
+	alter: true
+})
 
 module.exports = { User, Todo }

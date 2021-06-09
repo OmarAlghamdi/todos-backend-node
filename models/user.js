@@ -23,5 +23,14 @@ module.exports = sequelize =>
 		password: {
 			type: DataTypes.STRING,
 			allowNull: false
+		},
+		emailVerified: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+			defaultValue: false
+		},
+		verificationLink: {
+			type: DataTypes.STRING,
+			allowNull: true
 		}
 	})
