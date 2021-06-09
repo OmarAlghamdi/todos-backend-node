@@ -116,6 +116,12 @@ const signin = async (req, res, next) => {
 			statusCode: 400
 		})
 
+	if (!user.emailVerified)
+		return next({
+			message: 'your account has not been verified, please check the link send to your email',
+			statusCode: 403
+		})
+
 	const payload = { id: user.id }
 	const token = jwt.sign(payload, process.env.JWT_SECRET, {
 		expiresIn: process.env.JWT_EXPIRATION
