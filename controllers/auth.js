@@ -25,8 +25,7 @@ const sendVerificationEmail = async (email, name, link) => {
 				],
 				Subject: 'Welcome to Todos',
 				TextPart: `To verify your email follow this link: ${process.env.DNS_HOSTNAME}/auth/verify/${link}`,
-				HTMLPart:
-					`<h3>Welcome to <a href='${process.env.HOSTNAME}/'>Todos</a>!</h3><br />To verify your email visit <a href='${process.env.DNS_HOSTNAME}/auth/verify/${link}'/>${process.env.DNS_HOSTNAME}/auth/verify/${link}<a>`,
+				HTMLPart: `<h3>Welcome to <a href='${process.env.DNS_HOSTNAME}/'>Todos</a>!</h3><br />To verify your email visit <a href='${process.env.DNS_HOSTNAME}/auth/verify/${link}'/>${process.env.DNS_HOSTNAME}/auth/verify/${link}<a>`
 				// CustomID: 'AppGettingStartedTest'
 			}
 		]
@@ -37,11 +36,19 @@ const signup = async (req, res, next) => {
 	try {
 		const u = req.body.user
 
-		if(!u || !u.name || !u.password || !u.email
-			|| typeof u.name !== 'string' || typeof u.password !== 'string' || typeof u.email !== 'string') 
+		if (
+			!u ||
+			!u.name ||
+			!u.password ||
+			!u.email ||
+			typeof u.name !== 'string' ||
+			typeof u.password !== 'string' ||
+			typeof u.email !== 'string'
+		)
 			return next({
 				statusCode: 400,
-				message: 'request body should contain {user:{name:<string>, email:<string>, password:<string>}}'
+				message:
+					'request body should contain {user:{name:<string>, email:<string>, password:<string>}}'
 			})
 
 		const user = await User.create(u)
@@ -61,26 +68,28 @@ const signup = async (req, res, next) => {
 		// return res.json({ data: token })
 
 		try {
-			await sendVerificationEmail(user.email, user.name, user.verificationLink)
+			await sendVerificationEmail(
+				user.email,
+				user.name,
+				user.verificationLink
+			)
 			console.log('send successfully')
 		} catch (err) {
-			console.error(err);
+			console.error(err)
 		}
-		
 
 		return res.json({
 			data: 'a verification email has been sent to you. please see your email.'
 		})
 	} catch (err) {
 		console.error(err)
-		
-		if (err instanceof UniqueConstraintError)
-		return next({
-			message: 'email is already taken',
-			statusCode: 400
-		})
 
-		else if(err instanceof ValidationError) 
+		if (err instanceof UniqueConstraintError)
+			return next({
+				message: 'email is already taken',
+				statusCode: 400
+			})
+		else if (err instanceof ValidationError)
 			return next({
 				message: 'a valid email should be used',
 				statusCode: 400
@@ -91,11 +100,16 @@ const signup = async (req, res, next) => {
 const signin = async (req, res, next) => {
 	const { email, password } = req.body
 
-	if(!email || !password
-		|| typeof email !== 'string' || typeof password !== 'string')
+	if (
+		!email ||
+		!password ||
+		typeof email !== 'string' ||
+		typeof password !== 'string'
+	)
 		return next({
 			statusCode: 400,
-			message: 'request body should contain {email<string>, password:<string>}'
+			message:
+				'request body should contain {email<string>, password:<string>}'
 		})
 
 	const user = await User.findOne({
@@ -118,7 +132,8 @@ const signin = async (req, res, next) => {
 
 	if (!user.emailVerified)
 		return next({
-			message: 'your account has not been verified, please check the link send to your email',
+			message:
+				'your account has not been verified, please check the link send to your email',
 			statusCode: 403
 		})
 
@@ -132,7 +147,7 @@ const signin = async (req, res, next) => {
 
 const verifyEmail = async (req, res, next) => {
 	let token = req.query.token
-	token = token.substring(1, token.length-1)
+	token = token.substring(1, token.length - 1)
 	console.log(`verify: ${token}`)
 
 	const user = await User.findOne({

@@ -13,24 +13,25 @@ const getTodos = (req, res, next) => {
 const createTodo = (req, res, next) => {
 	const todo = req.body.todo
 
-	if(!todo || !todo.name || typeof todo.name !== 'string')
+	if (!todo || !todo.name || typeof todo.name !== 'string')
 		return next({
 			statusCode: 400,
 			message: 'request body should contain {todo:{name:<string>}}'
 		})
-	
 
-	Todo.create({
-		...todo,
-		UserId: req.user.id
-	}, {
-	}).then(todo => res.json({ data: { id: todo.id, name: todo.name} }))
+	Todo.create(
+		{
+			...todo,
+			UserId: req.user.id
+		},
+		{}
+	).then(todo => res.json({ data: { id: todo.id, name: todo.name } }))
 }
 
 const updateTodo = (req, res, next) => {
 	const todo = req.body.todo
 
-	if(!todo || !todo.name || typeof todo.name !== 'string')
+	if (!todo || !todo.name || typeof todo.name !== 'string')
 		return next({
 			statusCode: 400,
 			message: 'request body should contain {todo:{name:<string>}}'
