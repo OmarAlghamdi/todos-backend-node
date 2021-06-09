@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const { UniqueConstraintError, ValidationError } = require('sequelize')
 
 const { User } = require('../sequelize')
 
@@ -28,10 +29,18 @@ const signup = async (req, res, next) => {
 		return res.json({ data: token })
 	} catch (err) {
 		console.error(err)
+		
+		if (err instanceof UniqueConstraintError)
 		return next({
 			message: 'email is already taken',
 			statusCode: 400
 		})
+
+		else if(err instanceof ValidationError) 
+			return next({
+				message: 'a valid email should be used',
+				statusCode: 400
+			})
 	}
 }
 
