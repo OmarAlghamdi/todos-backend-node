@@ -124,4 +124,30 @@ const signin = async (req, res, next) => {
 	return res.json({ data: token })
 }
 
-module.exports = { signup, signin }
+const verifyEmail = async (req, res, next) => {
+	let token = req.query.token
+	token = token.substring(1, token.length-1)
+	console.log(`verify: ${token}`)
+
+	const user = await User.findOne({
+		where: {
+			verificationLink: token
+		}
+	})
+
+	if (!user)
+		return next({
+			message: 'invalid verification link',
+			statusCode: 404
+		})
+
+	user.emailVerified = true
+	user.verificationLink = null
+	await user.save()
+
+	return res.json({
+		data: 'your account has been verified, please log in.'
+	})
+}
+
+module.exports = { signup, signin, verifyEmail }
