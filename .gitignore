@@ -5,3 +5,5 @@ node_modules
 *.db
 
 lint-report-*.txt
+
+ssl
