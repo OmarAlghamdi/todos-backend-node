@@ -1,7 +1,6 @@
-
-// const jwt = localStorage.getItem('jwt')
-// if(!jwt)
-// 	window.location.href = './signin.html'
+const jwt = localStorage.getItem('jwt')
+if(!jwt)
+	window.location.href = './signin.html'
 
 $('#add').click(e => {3
 	
